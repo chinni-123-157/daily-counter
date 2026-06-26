@@ -1,0 +1,35 @@
+name: Daily Counter
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-counter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Update Counter
+        run: |
+          FILE="counter.txt"
+
+          LAST=$(tail -n 1 "$FILE")
+          NEXT=$((LAST + 1))
+
+          echo "$NEXT" >> "$FILE"
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add counter.txt
+          git commit -m "Daily counter update"
+          git push
